@@ -1,0 +1,7 @@
+Sales Summary
+-------------------------
+Total Sales: $73.23
+
+Details:
+pizza-sales.csv: $61.48
+side-sales.csv: $11.75
