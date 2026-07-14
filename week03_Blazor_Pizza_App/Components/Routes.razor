@@ -1,0 +1,16 @@
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(MainLayout)">
+            <PageTitle>Page not found</PageTitle>
+            <section class="content-card">
+                <h1>Page not found</h1>
+                <p>Sorry, this page does not exist.</p>
+                <a class="button-link" href="/">Return to the pizza list</a>
+            </section>
+        </LayoutView>
+    </NotFound>
+</Router>

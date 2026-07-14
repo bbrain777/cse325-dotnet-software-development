@@ -1,0 +1,64 @@
+@page "/"
+@inject PizzaService PizzaService
+
+<PageTitle>Get Pizza List | Blazor Pizza</PageTitle>
+
+<section class="hero">
+    <div>
+        <p class="eyebrow">CSE 325 · Week 03</p>
+        <h1>Get Pizza List</h1>
+        <p class="hero-copy">
+            Choose a pizza below. Prices are shown in British pounds, as required for the United Kingdom.
+        </p>
+    </div>
+    <div class="hero-badge" aria-label="Application status">
+        <span>✓</span>
+        Running locally
+    </div>
+</section>
+
+@if (pizzas.Count == 0)
+{
+    <section class="content-card">
+        <p>No pizzas are currently available.</p>
+    </section>
+}
+else
+{
+    <section class="pizza-grid" aria-label="Available pizzas">
+        @foreach (var pizza in pizzas)
+        {
+            <article class="pizza-card">
+                <div class="pizza-emoji" aria-hidden="true">@pizza.Emoji</div>
+                <div class="pizza-details">
+                    <h2>@pizza.Name</h2>
+                    <p>@pizza.Description</p>
+                    <div class="pizza-meta">
+                        <strong>@pizza.Price.ToString("C", ukCulture)</strong>
+                        <a class="details-link" href="@($"/pizza/{pizza.Id}")">View details</a>
+                    </div>
+                </div>
+            </article>
+        }
+    </section>
+}
+
+<section class="content-card learning-summary">
+    <h2>What this application demonstrates</h2>
+    <div class="summary-grid">
+        <div><strong>Pages</strong><span>Home and About Razor pages</span></div>
+        <div><strong>Routing</strong><span>Navigation and pizza ID routes</span></div>
+        <div><strong>Layout</strong><span>Reusable header and footer</span></div>
+        <div><strong>Data</strong><span>Pizza data supplied by a C# service</span></div>
+    </div>
+</section>
+
+@code {
+    private readonly CultureInfo ukCulture = CultureInfo.GetCultureInfo("en-GB");
+    private IReadOnlyList<Pizza> pizzas = Array.Empty<Pizza>();
+
+    protected override void OnInitialized()
+    {
+        pizzas = PizzaService.GetPizzas();
+    }
+}

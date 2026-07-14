@@ -1,0 +1,37 @@
+@page "/pizza/{Id:int}"
+@inject PizzaService PizzaService
+
+<PageTitle>@(pizza is null ? "Pizza not found" : $"{pizza.Name} | Blazor Pizza")</PageTitle>
+
+@if (pizza is null)
+{
+    <section class="content-card">
+        <h1>Pizza not found</h1>
+        <p>We could not find a pizza with ID @Id.</p>
+        <a class="button-link" href="/">Back to the pizza list</a>
+    </section>
+}
+else
+{
+    <section class="content-card details-page">
+        <a class="back-link" href="/">← Back to Get Pizza List</a>
+        <div class="details-emoji" aria-hidden="true">@pizza.Emoji</div>
+        <p class="eyebrow">Pizza number @pizza.Id</p>
+        <h1>@pizza.Name</h1>
+        <p>@pizza.Description</p>
+        <p class="details-price">@pizza.Price.ToString("C", ukCulture)</p>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private readonly CultureInfo ukCulture = CultureInfo.GetCultureInfo("en-GB");
+    private Pizza? pizza;
+
+    protected override void OnParametersSet()
+    {
+        pizza = PizzaService.GetPizza(Id);
+    }
+}

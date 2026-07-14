@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+
+<div class="site-shell">
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="/" aria-label="Blazor Pizza home">
+                <span class="brand-mark">🍕</span>
+                <span>
+                    <strong>Blazor Pizza</strong>
+                    <small>Fresh pizza, built with .NET</small>
+                </span>
+            </a>
+
+            <nav aria-label="Main navigation">
+                <NavLink href="/" Match="NavLinkMatch.All">Get Pizza List</NavLink>
+                <NavLink href="/about">About</NavLink>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 Olakunle Tayo Obademi | United Kingdom</p>
+        <p>Currency displayed in British pounds sterling (£).</p>
+    </footer>
+</div>
