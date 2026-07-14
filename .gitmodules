@@ -1,0 +1,9 @@
+[submodule "week02/MvcMovie"]
+	path = week02/MvcMovie
+	url = https://github.com/bbrain777/cse325-week02-mvcmovie.git
+	branch = main
+
+[submodule "week03/BlazorPizza_Week3_Complete"]
+	path = week03/BlazorPizza_Week3_Complete
+	url = https://github.com/bbrain777/BlazorPizza_Week3_Complete.git
+	branch = main
