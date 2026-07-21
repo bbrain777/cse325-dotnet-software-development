@@ -1,0 +1,166 @@
+@using ConnectFour.Game
+@inject GameState State
+
+<div class="game-shell" style="@ThemeVariables">
+    <header class="game-header">
+        <div>
+            <p class="eyebrow">CSE 325 · Blazor</p>
+            <h1>Connect Four</h1>
+            <p class="subtitle">Drop four pieces in a row—across, down, or diagonally—to win.</p>
+        </div>
+        <div class="scoreboard" aria-label="Match score">
+            <div><span class="score-dot player-one"></span><strong>@State.Player1Wins</strong><small>Player 1</small></div>
+            <div><strong>@State.Ties</strong><small>Draws</small></div>
+            <div><span class="score-dot player-two"></span><strong>@State.Player2Wins</strong><small>Player 2</small></div>
+        </div>
+    </header>
+
+    <main class="game-content">
+        <section class="play-area" aria-label="Connect Four game">
+            <div class="status-card @StatusClass" role="status" aria-live="polite">
+                <span class="turn-piece player-@State.PlayerTurn"></span>
+                <div>
+                    <strong>@StatusTitle</strong>
+                    <span>@StatusDetail</span>
+                </div>
+                <button class="new-round" type="button" @onclick="NewRound">
+                    @(GameIsOver ? "Play again" : "Restart round")
+                </button>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <div class="error-message" role="alert">@errorMessage</div>
+            }
+
+            <div class="column-controls" aria-label="Choose a column">
+                @for (var column = 0; column < GameState.Columns; column++)
+                {
+                    var selectedColumn = column;
+                    <button type="button"
+                            title="Drop a piece in column @(selectedColumn + 1)"
+                            aria-label="Drop a piece in column @(selectedColumn + 1)"
+                            disabled="@(GameIsOver || State.IsColumnFull(selectedColumn))"
+                            @onclick="() => PlayPiece(selectedColumn)">
+                        <span aria-hidden="true">↓</span>
+                    </button>
+                }
+            </div>
+
+            <div class="board" role="grid" aria-label="Connect Four board">
+                @for (var row = 0; row < GameState.Rows; row++)
+                {
+                    @for (var column = 0; column < GameState.Columns; column++)
+                    {
+                        var player = State.GetCell(row, column);
+                        <div class="slot" role="gridcell" aria-label="@CellLabel(row, column, player)">
+                            <span class="piece @(player == 0 ? "empty" : $"player-{player}")"></span>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div class="color-controls">
+                <span>Piece colors</span>
+                <label>Player 1 <input type="color" @bind="player1Color" /></label>
+                <label>Player 2 <input type="color" @bind="player2Color" /></label>
+            </div>
+        </section>
+
+        <aside class="history-card" aria-label="Move history">
+            <div class="history-heading">
+                <div>
+                    <p class="eyebrow">Extra feature</p>
+                    <h2>Move history</h2>
+                </div>
+                <span>@State.CurrentTurn / 42</span>
+            </div>
+
+            @if (State.Moves.Count == 0)
+            {
+                <div class="empty-history">
+                    <span aria-hidden="true">↙</span>
+                    <p>Your moves will appear here.</p>
+                </div>
+            }
+            else
+            {
+                <ol class="move-list">
+                    @foreach (var move in State.Moves.AsEnumerable().Reverse())
+                    {
+                        <li>
+                            <span class="move-number">@move.Number</span>
+                            <span class="score-dot player-@(move.Player == 1 ? "one" : "two")"></span>
+                            <span>Player @move.Player</span>
+                            <strong>Column @(move.Column + 1)</strong>
+                        </li>
+                    }
+                </ol>
+            }
+
+            <button class="reset-match" type="button" @onclick="ResetMatch">Reset match score</button>
+        </aside>
+    </main>
+</div>
+
+@code {
+    [Parameter] public string BoardColor { get; set; } = "#155eef";
+    [Parameter] public string Player1Color { get; set; } = "#ef4444";
+    [Parameter] public string Player2Color { get; set; } = "#facc15";
+
+    private string player1Color = "#ef4444";
+    private string player2Color = "#facc15";
+    private string errorMessage = string.Empty;
+    private bool GameIsOver => State.Result != GameState.WinState.NoWinner;
+    private string ThemeVariables => $"--board-bg:{BoardColor};--player1:{player1Color};--player2:{player2Color};";
+
+    private string StatusTitle => State.Result switch
+    {
+        GameState.WinState.Player1Wins => "Player 1 wins!",
+        GameState.WinState.Player2Wins => "Player 2 wins!",
+        GameState.WinState.Tie => "It’s a draw!",
+        _ => $"Player {State.PlayerTurn}’s turn"
+    };
+
+    private string StatusDetail => GameIsOver
+        ? "Great round. Start another when you’re ready."
+        : "Choose any open column below.";
+
+    private string StatusClass => GameIsOver ? "game-over" : string.Empty;
+
+    protected override void OnInitialized()
+    {
+        player1Color = Player1Color;
+        player2Color = Player2Color;
+        State.ResetBoard(resetScore: true);
+    }
+
+    private void PlayPiece(int column)
+    {
+        errorMessage = string.Empty;
+        try
+        {
+            State.PlayPiece(column);
+        }
+        catch (InvalidOperationException ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+    private void NewRound()
+    {
+        State.ResetBoard();
+        errorMessage = string.Empty;
+    }
+
+    private void ResetMatch()
+    {
+        State.ResetBoard(resetScore: true);
+        errorMessage = string.Empty;
+    }
+
+    private static string CellLabel(int row, int column, int player) => player == 0
+        ? $"Row {row + 1}, column {column + 1}, empty"
+        : $"Row {row + 1}, column {column + 1}, Player {player}";
+}
